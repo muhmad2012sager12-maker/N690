@@ -1,0 +1,118 @@
+‏Local LP = game:GetService("Players").LocalPlayer
+‏local u, c = UDim2.new, Color3.fromRGB
+
+-- إنشاء الواجهة
+‏local G = Instance.new("ScreenGui", LP.PlayerGui); G.Name = "N60_Final_Pure_V18"; G.ResetOnSpawn = false
+
+-- [ الزر الصغير ]
+‏local ToggleBtn = Instance.new("TextButton", G)
+‏ToggleBtn.Size, ToggleBtn.Position = u(0, 50, 0, 50), u(0.02, 0, 0.4, 0)
+‏ToggleBtn.BackgroundColor3, ToggleBtn.Text = c(25, 0, 0), "N60"
+‏ToggleBtn.TextColor3, ToggleBtn.Font = c(255, 0, 0), Enum.Font.GothamBold
+‏Instance.new("UICorner", ToggleBtn); Instance.new("UIStroke", ToggleBtn).Color = c(255, 0, 0)
+
+-- [ القائمة الرئيسية ]
+‏local Main = Instance.new("Frame", G)
+‏Main.Size, Main.Position = u(0, 320, 0, 350), u(0.5, -160, 0.5, -175)
+‏Main.BackgroundColor3, Main.Draggable = c(10, 10, 10), true
+‏Instance.new("UICorner", Main); Instance.new("UIStroke", Main).Color = c(255, 0, 0)
+
+‏ToggleBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
+
+-- [ الخانات ]
+‏local NameInput = Instance.new("TextBox", Main)
+‏NameInput.Size, NameInput.Position = u(0.8, 0, 0, 40), u(0.1, 0, 0.1, 0)
+‏NameInput.PlaceholderText, NameInput.Text = "الاسم الوهمي الجديد..", "147258369jd1"
+‏NameInput.BackgroundColor3, NameInput.TextColor3 = c(25, 25, 25), c(255, 255, 255)
+‏Instance.new("UICorner", NameInput)
+
+‏local NumberInput = Instance.new("TextBox", Main)
+‏NumberInput.Size, NumberInput.Position = u(0.8, 0, 0, 40), u(0.1, 0, 0.35, 0)
+‏NumberInput.PlaceholderText, NumberInput.Text = "رقم اللفل..", "3"
+‏NumberInput.BackgroundColor3, NumberInput.TextColor3 = c(25, 25, 25), c(255, 255, 255)
+‏Instance.new("UICorner", NumberInput)
+
+-- [ الأزرار ]
+‏local ApplyName = Instance.new("TextButton", Main)
+‏ApplyName.Size, ApplyName.Position = u(0.8, 0, 0, 35), u(0.1, 0, 0.22, 0)
+‏ApplyName.Text, ApplyName.BackgroundColor3 = "إخفاء الأصلي وتفعيل الوهمي ✅", c(0, 120, 0)
+‏ApplyName.TextColor3 = c(255, 255, 255)
+‏Instance.new("UICorner", ApplyName)
+
+‏local ApplyLevel = Instance.new("TextButton", Main)
+‏ApplyLevel.Size, ApplyLevel.Position = u(0.8, 0, 0, 35), u(0.1, 0, 0.48, 0)
+‏ApplyLevel.Text, ApplyLevel.BackgroundColor3 = "تفعيل اللفل (شفاف 50%) ✅", c(150, 0, 0)
+‏ApplyLevel.TextColor3 = c(255, 255, 255)
+‏Instance.new("UICorner", ApplyLevel)
+
+-- [[ المحركات ]]
+
+-- 1. محرك الاسم (يمسح الاسم الذي داخل الدائرة فقط)
+‏ApplyName.MouseButton1Click:Connect(function()
+‏    task.spawn(function()
+‏        while true do
+‏            local char = LP.Character
+‏            if char and char:FindFirstChild("Head") then
+                -- إخفاء اسم نظام اللعبة
+‏                if char:FindFirstChild("Humanoid") then
+‏                    char.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+‏                end
+                
+                -- البحث عن نصوص الأسماء في لوحات الماب
+‏                for _, v in pairs(char:GetDescendants()) do
+‏                    if v:IsA("BillboardGui") and v.Name ~= "N60_Tag" and v.Name ~= "ESP_Tag" then
+‏                        for _, obj in pairs(v:GetDescendants()) do
+‏                            if obj:IsA("TextLabel") then
+                                -- إذا كان النص ليس رقماً (يعني هو الاسم الأصلي) نقوم بإخفائه
+‏                                if not tonumber(obj.Text) and obj.Text ~= NumberInput.Text and string.len(obj.Text) > 2 then
+‏                                    obj.TextTransparency = 1 -- إخفاء الاسم فقط
+‏                                end
+‏                            end
+‏                        end
+‏                    end
+‏                end
+
+                -- إنشاء اسمك الوهمي في مكان مناسب
+‏                local myTag = char:FindFirstChild("N60_Tag") or Instance.new("BillboardGui", char)
+‏                myTag.Name = "N60_Tag"; myTag.Adornee = char.Head; myTag.Size = u(0, 250, 0, 50)
+‏                myTag.ExtentsOffset = Vector3.new(0, 1.2, 0); myTag.AlwaysOnTop = false -- تم خفض الارتفاع ليكون مكان الاسم الممسوح
+
+‏                local nameLabel = myTag:FindFirstChild("TextLabel") or Instance.new("TextLabel", myTag)
+‏                nameLabel.Size, nameLabel.BackgroundTransparency = u(1, 0, 1, 0), 1
+‏                nameLabel.Text = NameInput.Text
+‏                nameLabel.TextColor3 = c(255, 255, 255); nameLabel.TextTransparency = 0.8
+‏                nameLabel.Font = Enum.Font.SourceSansBold; nameLabel.TextSize = 22
+‏            end
+‏            task.wait(0.5)
+‏        end
+‏    end)
+‏end)
+
+-- 2. محرك اللفل (يحافظ على ما فوق الاسم)
+‏ApplyLevel.MouseButton1Click:Connect(function()
+‏    task.spawn(function()
+‏        while true do
+‏            local char = LP.Character
+‏            if char then
+‏                for _, v in pairs(char:GetDescendants()) do
+‏                    if v:IsA("BillboardGui") and v.Name ~= "N60_Tag" then
+‏                        for _, obj in pairs(v:GetDescendants()) do
+                            -- تعديل الرقم الأوسط فقط دون لمس الصور أو الخلفيات
+‏                            if obj:IsA("TextLabel") and (tonumber(obj.Text) or obj.Text == NumberInput.Text or string.len(obj.Text) <= 2) then
+                                -- إخفاء الرقم الأحمر الزائد
+‏                                if obj.TextColor3 == c(255, 0, 0) or obj.TextColor3 == c(196, 40, 28) then
+‏                                    obj.Visible = false
+‏                                else
+‏                                    obj.Text = NumberInput.Text
+‏                                    obj.TextTransparency = 0.5
+‏                                    obj.Visible = true
+‏                                end
+‏                            end
+‏                        end
+‏                    end
+‏                end
+‏            end
+‏            task.wait(0.1)
+‏        end
+‏    end)
+‏end)
